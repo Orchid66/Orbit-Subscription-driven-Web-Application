@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ORBIT — Score. Draw. Give.</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+:root{--bg:#07090D;--surf:#0F1319;--surf2:#181F2A;--bdr:#1E2733;--bdr2:#2A3547;--amb:#E8A020;--ambl:#F5C84A;--ambd:rgba(232,160,32,0.12);--grn:#1DBE8B;--grnd:rgba(29,190,139,0.12);--tx:#F0EDE8;--mu:#7A8BA0;--mu2:#3A4A60;--red:#E85040;--redd:rgba(232,80,64,0.12);--blu:#4A9EE8;--blud:rgba(74,158,232,0.12);}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,h5{font-family:'Syne',sans-serif}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:3px}
+.ctr{max-width:1100px;margin:0 auto;padding:0 24px}
+.btn{cursor:pointer;border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;border-radius:8px;padding:10px 20px;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px}
+.btn-p{background:var(--amb);color:#050709}.btn-p:hover{background:var(--ambl)}
+.btn-o{background:transparent;color:var(--tx);border:1px solid var(--bdr2)}.btn-o:hover{border-color:var(--amb);color:var(--amb)}
+.btn-g{background:transparent;color:var(--mu);border:none}.btn-g:hover{color:var(--tx)}
+.btn-grn{background:var(--grn);color:#041A12}.btn-grn:hover{filter:brightness(1.1)}
+.btn-red{background:var(--redd);color:var(--red);border:1px solid rgba(232,80,64,0.3)}.btn-red:hover{background:rgba(232,80,64,0.2)}
+.btn-sm{padding:6px 14px;font-size:13px}.btn-lg{padding:13px 26px;font-size:16px}
+.card{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:20px}
+input,select,textarea{background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:14px;padding:10px 14px;width:100%;outline:none;transition:border-color 0.15s}
+input:focus,select:focus,textarea:focus{border-color:var(--amb)}
+input::placeholder{color:var(--mu2)}
+select option{background:var(--surf2)}
+label{font-size:13px;color:var(--mu);font-weight:500;display:block;margin-bottom:6px}
+.fg{margin-bottom:16px}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500}
+.badge-grn{background:var(--grnd);color:var(--grn)}.badge-amb{background:var(--ambd);color:var(--amb)}.badge-mu{background:var(--surf2);color:var(--mu)}.badge-red{background:var(--redd);color:var(--red)}.badge-blu{background:var(--blud);color:var(--blu)}
+.tabs{display:flex;gap:2px;background:var(--surf2);border-radius:10px;padding:4px;flex-wrap:wrap}
+.tab{background:transparent;border:none;color:var(--mu);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:7px 14px;border-radius:7px;cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.tab.on{background:var(--surf);color:var(--tx)}.tab:hover:not(.on){color:var(--tx)}
+.sc{background:var(--surf2);border-radius:10px;padding:14px 18px}.sc-lbl{font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}.sc-val{font-size:22px;font-family:'Syne',sans-serif;font-weight:700}
+.ovl{position:fixed;inset:0;background:rgba(4,6,10,0.85);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;backdrop-filter:blur(4px)}
+.modal{background:var(--surf);border:1px solid var(--bdr2);border-radius:16px;width:100%;max-width:480px;max-height:92vh;overflow-y:auto}
+.modal-hd{padding:24px 24px 0;display:flex;justify-content:space-between;align-items:flex-start}
+.modal-bd{padding:20px 24px 24px}
+.toast-ctr{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:9999}
+.toast{background:var(--surf2);border:1px solid var(--bdr2);border-radius:10px;padding:12px 16px;font-size:14px;min-width:260px;animation:si 0.2s ease}
+.t-ok{border-left:3px solid var(--grn)}.t-err{border-left:3px solid var(--red)}.t-info{border-left:3px solid var(--amb)}
+@keyframes si{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fu 0.35s ease forwards}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.pulse{animation:pulse 1.4s ease-in-out infinite}
+.sep{border:none;border-top:1px solid var(--bdr);margin:18px 0}
+.ball{width:50px;height:50px;border-radius:50%;background:var(--surf2);border:2px solid var(--bdr2);display:flex;align-items:center;justify-content:center;font-size:17px;font-family:'Syne',sans-serif;font-weight:700;transition:all 0.4s}
+.ball.rev{background:rgba(232,160,32,0.15);border-color:var(--amb);color:var(--ambl)}
+.ball.match{background:rgba(29,190,139,0.15);border-color:var(--grn);color:var(--grn)}
+.pbar{height:5px;background:var(--bdr);border-radius:3px;overflow:hidden}
+.pfill{height:100%;border-radius:3px;transition:width 0.5s}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--mu);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.4px;padding:10px 12px;border-bottom:1px solid var(--bdr)}
+td{padding:11px 12px;border-bottom:1px solid var(--bdr)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,0.015)}
+nav{position:sticky;top:0;z-index:100;background:rgba(7,9,13,0.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--bdr)}
+.nav-i{height:64px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--amb);letter-spacing:-0.5px;cursor:pointer;user-select:none}
+.hero{min-height:88vh;display:flex;align-items:center;position:relative;padding:80px 0}
+.hero-bg{position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:700px;height:700px;background:radial-gradient(ellipse,rgba(232,160,32,0.05) 0%,transparent 65%);pointer-events:none}
+.gtext{background:linear-gradient(90deg,var(--amb) 0%,var(--ambl) 60%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+input[type=range]{-webkit-appearance:none;appearance:none;height:4px;background:var(--bdr2);border-radius:2px;outline:none;padding:0;border:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:var(--amb);border-radius:50%;cursor:pointer}
+.chip{display:inline-flex;align-items:center;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:500;background:var(--surf2);color:var(--mu)}
+.chk{width:18px;height:18px;border-radius:4px;border:2px solid var(--bdr2);background:transparent;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;flex-shrink:0}
+.chk.on{background:var(--amb);border-color:var(--amb)}
+@media(max-width:768px){.ctr{padding:0 14px}.hero{min-height:65vh;padding:50px 0}.hm{display:none!important}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useRef,useCallback}=React;
+
+/* ───── DATA ───── */
+const CHARITIES=[
+  {id:'c1',emoji:'💧',name:'Clean Water Initiative',desc:'Delivering clean water access to rural communities across Sub-Saharan Africa.',impact:'12,400 people served',category:'Humanitarian'},
+  {id:'c2',emoji:'🧠',name:'Mental Health Matters',desc:'Supporting young people through evidence-based mental health programs and crisis helplines.',impact:'8,200 sessions funded',category:'Health'},
+  {id:'c3',emoji:'🌳',name:'Reforestation Trust',desc:'Planting native trees to restore biodiversity and fight the effects of climate change.',impact:'2.1M trees planted',category:'Environment'},
+  {id:'c4',emoji:'🌾',name:'Food Futures',desc:'Fighting food insecurity through sustainable agricultural training and community kitchens.',impact:'3,600 families supported',category:'Humanitarian'},
+  {id:'c5',emoji:'🌊',name:'Ocean Guardians',desc:'Protecting marine ecosystems through conservation research and global clean-up campaigns.',impact:'140 tonnes removed',category:'Environment'},
+];
+
+const ri=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+
+function mkScores(n=5){
+  const scores=[];
+  for(let i=0;i<n;i++){
+    const d=new Date();
+    d.setDate(d.getDate()-((i*8)+ri(1,5)));
+    scores.push({id:`sc${Date.now()}${i}`,score:ri(16,38),date:d.toISOString().split('T')[0]});
+  }
+  return scores.sort((a,b)=>new Date(b.date)-new Date(a.date));
+}
+
+let _uid=100;
+const makeId=()=>`u${++_uid}`;
+
+const DRAWS=[
+  {id:'d1',month:'February 2026',numbers:[8,17,24,31,42],status:'published',jackpotRolled:false,prizePool:{total:598,jackpot:239,four:209,three:149}},
+  {id:'d2',month:'March 2026',numbers:[5,12,22,35,40],status:'published',jackpotRolled:false,prizePool:{total:598,jackpot:239,four:209,three:149}},
+  {id:'d3',month:'April 2026',numbers:null,status:'pending',jackpotRolled:false,prizePool:{total:0,jackpot:0,four:0,three:0}},
+];
+
+const INITIAL_USERS=[
+  {id:'admin',email:'admin@orbit.com',password:'admin123',name:'Alex Admin',role:'admin',
+    sub:{plan:'yearly',status:'active',renewal:'2027-01-15'},
+    scores:[],charity:{id:'c1',pct:15},winnings:{total:0,pending:0,paid:0},
+    verified:true},
+  {id:'u1',email:'demo@orbit.com',password:'demo123',name:'Jordan Clarke',role:'subscriber',
+    sub:{plan:'monthly',status:'active',renewal:'2026-05-15'},
+    scores:mkScores(5),charity:{id:'c2',pct:12},winnings:{total:62.50,pending:0,paid:62.50},
+    verified:true,drawResults:[{drawId:'d1',matched:3,prize:24.67},{drawId:'d2',matched:2,prize:0}]},
+  {id:'u2',email:'sarah@example.com',password:'pass123',name:'Sarah Mitchell',role:'subscriber',
+    sub:{plan:'monthly',status:'active',renewal:'2026-05-22'},
+    scores:mkScores(5),charity:{id:'c3',pct:10},winnings:{total:118.55,pending:31.25,paid:87.30},
+    verified:true,drawResults:[{drawId:'d1',matched:4,prize:209,verifyStatus:'paid'},{drawId:'d2',matched:3,prize:31.25,verifyStatus:'pending'}]},
+  {id:'u3',email:'tom@example.com',password:'pass123',name:'Tom Walker',role:'subscriber',
+    sub:{plan:'yearly',status:'active',renewal:'2027-03-01'},
+    scores:mkScores(5),charity:{id:'c1',pct:20},winnings:{total:24.10,pending:0,paid:24.10},
+    verified:true,drawResults:[{drawId:'d1',matched:3,prize:24.67,verifyStatus:'paid'}]},
+  {id:'u4',email:'priya@example.com',password:'pass123',name:'Priya Sharma',role:'subscriber',
+    sub:{plan:'monthly',status:'inactive',renewal:'2026-03-01'},
+    scores:mkScores(3),charity:{id:'c4',pct:10},winnings:{total:24.10,pending:0,paid:24.10},
+    verified:false,drawResults:[]},
+  {id:'u5',email:'mike@example.com',password:'pass123',name:'Mike Johnson',role:'subscriber',
+    sub:{plan:'monthly',status:'active',renewal:'2026-05-08'},
+    scores:mkScores(5),charity:{id:'c5',pct:15},winnings:{total:210,pending:210,paid:0},
+    verified:true,drawResults:[{drawId:'d2',matched:5,prize:239,verifyStatus:'pending'}]},
+];
+
+/* ───── UTILS ───── */
+let _setToasts=null;
+function toast(msg,type='info'){
+  if(!_setToasts)return;
+  const id=Date.now();
+  _setToasts(p=>[...p,{id,msg,type}]);
+  setTimeout(()=>_setToasts(p=>p.filter(t=>t.id!==id)),3500);
+}
+
+function fmtDate(s){if(!s)return'—';return new Date(s).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
+function fmtShort(s){if(!s)return'—';return new Date(s).toLocaleDateString('en-GB',{day:'numeric',month:'short'});}
+function fmt2(n){return Number(n||0).toFixed(2);}
+function genDrawNums(){const s=new Set();while(s.size<5)s.add(ri(1,45));return Array.from(s).sort((a,b)=>a-b);}
+function checkMatch(scores,drawNums){if(!scores||scores.length<5||!drawNums)return 0;const s=scores.map(x=>x.score);return drawNums.filter(n=>s.includes(n)).length;}
+function calcPool(subs){const rev=subs*9.99;const p=rev*0.60;return{total:p,jackpot:p*0.40,four:p*0.35,three:p*0.25};}
+function subFee(plan){return plan==='yearly'?99.99:9.99;}
+function charityById(id){return CHARITIES.find(c=>c.id===id)||CHARITIES[0];}
+
+/* ───── TOAST SYSTEM ───── */
+function ToastSystem(){
+  const [toasts,setToasts]=useState([]);
+  useEffect(()=>{_setToasts=setToasts;},[]);
+  return <div className="toast-ctr">{toasts.map(t=><div key={t.id} className={`toast t-${t.type}`}>{t.msg}</div>)}</div>;
+}
+
+/* ───── NAVBAR ───── */
+function Navbar({page,setPage,user,onAuth,onLogout}){
+  return(
+    <nav>
+      <div className="ctr nav-i">
+        <div style={{display:'flex',alignItems:'center',gap:32}}>
+          <span className="logo" onClick={()=>setPage('landing')}>ORBIT</span>
+          {user&&(
+            <div className="hm" style={{display:'flex',gap:4}}>
+              <button className={`btn btn-g btn-sm ${page==='dashboard'?'':''}`} onClick={()=>setPage('dashboard')} style={page==='dashboard'?{color:'var(--amb)'}:{}}>Dashboard</button>
+              <button className={`btn btn-g btn-sm`} onClick={()=>setPage('charities')} style={page==='charities'?{color:'var(--amb)'}:{}}>Charities</button>
+              {user.role==='admin'&&<button className="btn btn-g btn-sm" onClick={()=>setPage('admin')} style={page==='admin'?{color:'var(--amb)'}:{}}>Admin ✦</button>}
+            </div>
+          )}
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:10}}>
+          {user?(
+            <>
+              <span style={{color:'var(--mu)',fontSize:13}} className="hm">{user.name}</span>
+              <button className="btn btn-o btn-sm" onClick={onLogout}>Sign out</button>
+            </>
+          ):(
+            <>
+              <button className="btn btn-g btn-sm" onClick={()=>onAuth('login')}>Sign in</button>
+              <button className="btn btn-p btn-sm" onClick={()=>onAuth('signup')}>Get started →</button>
+            </>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+/* ───── AUTH MODAL ───── */
+function AuthModal({mode:initMode,onClose,onSuccess}){
+  const [mode,setMode]=useState(initMode);
+  const [form,setForm]=useState({name:'',email:'',password:'',plan:'monthly',charityId:'c1'});
+  const [step,setStep]=useState(1);// signup: 1=account 2=plan 3=charity
+  const [err,setErr]=useState('');
+  const [users,setUsers]=useState(null);
+
+  useEffect(()=>{
+    const stored=localStorage.getItem('orbit_users');
+    setUsers(stored?JSON.parse(stored):INITIAL_USERS);
+  },[]);
+
+  const set=(k,v)=>setForm(f=>({...f,[k]:v}));
+
+  function handleLogin(){
+    if(!users)return;
+    const u=users.find(x=>x.email===form.email&&x.password===form.password);
+    if(!u){setErr('Invalid email or password.');return;}
+    onSuccess(u);
+  }
+
+  function handleSignup(){
+    if(!form.name||!form.email||!form.password){setErr('All fields required.');return;}
+    if(form.password.length<6){setErr('Password must be at least 6 characters.');return;}
+    if(users.find(u=>u.email===form.email)){setErr('Email already registered.');return;}
+    const nu={
+      id:makeId(),email:form.email,password:form.password,name:form.name,role:'subscriber',
+      sub:{plan:form.plan,status:'active',renewal:new Date(Date.now()+30*86400000).toISOString().split('T')[0]},
+      scores:[],charity:{id:form.charityId,pct:10},winnings:{total:0,pending:0,paid:0},
+      verified:false,drawResults:[],
+    };
+    const newUsers=[...users,nu];
+    localStorage.setItem('orbit_users',JSON.stringify(newUsers));
+    onSuccess(nu,newUsers);
+  }
+
+  if(!users)return null;
+
+  return(
+    <div className="ovl" onClick={e=>{if(e.target===e.currentTarget)onClose()}}>
+      <div className="modal fu">
+        <div className="modal-hd">
+          <div>
+            <h2 style={{fontSize:20,marginBottom:4}}>{mode==='login'?'Welcome back':'Create your account'}</h2>
+            <p style={{fontSize:13,color:'var(--mu)'}}>
+              {mode==='login'?'Sign in to your ORBIT account.':'Join thousands making a difference through golf.'}
+            </p>
+          </div>
+          <button className="btn btn-g" style={{padding:6}} onClick={onClose}>✕</button>
+        </div>
+        <div className="modal-bd">
+          {err&&<div style={{background:'var(--redd)',border:'1px solid rgba(232,80,64,0.3)',borderRadius:8,padding:'10px 14px',fontSize:13,color:'var(--red)',marginBottom:16}}>{err}</div>}
+
+          {mode==='login'&&(
+            <>
+              <div className="fg"><label>Email</label><input type="email" placeholder="you@example.com" value={form.email} onChange={e=>set('email',e.target.value)}/></div>
+              <div className="fg"><label>Password</label><input type="password" placeholder="••••••••" value={form.password} onChange={e=>set('password',e.target.value)} onKeyDown={e=>e.key==='Enter'&&handleLogin()}/></div>
+              <button className="btn btn-p btn-lg" style={{width:'100%',marginTop:4,justifyContent:'center'}} onClick={handleLogin}>Sign in</button>
+              <p style={{textAlign:'center',marginTop:16,fontSize:13,color:'var(--mu)'}}>No account? <span style={{color:'var(--amb)',cursor:'pointer'}} onClick={()=>{setMode('signup');setErr('');setStep(1);}}>Sign up free</span></p>
+              <hr className="sep"/>
+              <p style={{textAlign:'center',fontSize:12,color:'var(--mu2)'}}>Demo credentials: <b style={{color:'var(--mu)'}}>demo@orbit.com</b> / <b style={{color:'var(--mu)'}}>demo123</b></p>
+              <p style={{textAlign:'center',fontSize:12,color:'var(--mu2)',marginTop:4}}>Admin: <b style={{color:'var(--mu)'}}>admin@orbit.com</b> / <b style={{color:'var(--mu)'}}>admin123</b></p>
+            </>
+          )}
+
+          {mode==='signup'&&step===1&&(
+            <>
+              <div className="fg"><label>Full name</label><input placeholder="Your name" value={form.name} onChange={e=>set('name',e.target.value)}/></div>
+              <div className="fg"><label>Email address</label><input type="email" placeholder="you@example.com" value={form.email} onChange={e=>set('email',e.target.value)}/></div>
+              <div className="fg"><label>Password</label><input type="password" placeholder="Min. 6 characters" value={form.password} onChange={e=>set('password',e.target.value)}/></div>
+              <button className="btn btn-p btn-lg" style={{width:'100%',justifyContent:'center'}} onClick={()=>{
+                if(!form.name||!form.email||!form.password){setErr('All fields required.');return;}
+                if(form.password.length<6){setErr('Password too short.');return;}
+                if(users.find(u=>u.email===form.email)){setErr('Email already registered.');return;}
+                setErr('');setStep(2);
+              }}>Continue →</button>
+              <p style={{textAlign:'center',marginTop:16,fontSize:13,color:'var(--mu)'}}>Have an account? <span style={{color:'var(--amb)',cursor:'pointer'}} onClick={()=>{setMode('login');setErr('');}}>Sign in</span></p>
+            </>
+          )}
+
+          {mode==='signup'&&step===2&&(
+            <>
+              <h3 style={{fontSize:16,marginBottom:4}}>Choose your plan</h3>
+              <p style={{fontSize:13,color:'var(--mu)',marginBottom:16}}>A portion of every subscription funds the monthly draw prize pool and your chosen charity.</p>
+              {['monthly','yearly'].map(plan=>(
+                <div key={plan} onClick={()=>set('plan',plan)} style={{border:`2px solid ${form.plan===plan?'var(--amb)':'var(--bdr)'}`,borderRadius:10,padding:'14px 16px',marginBottom:10,cursor:'pointer',background:form.plan===plan?'var(--ambd)':'var(--surf2)',transition:'all 0.15s'}}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                    <div>
+                      <div style={{fontWeight:600,fontSize:15,textTransform:'capitalize'}}>{plan}</div>
+                      <div style={{fontSize:13,color:'var(--mu)',marginTop:2}}>{plan==='monthly'?'Flexible, cancel anytime':'Save ~17% — billed once a year'}</div>
+                    </div>
+                    <div style={{textAlign:'right'}}>
+                      <div style={{fontFamily:'Syne,sans-serif',fontSize:20,fontWeight:700,color:'var(--amb)'}}>£{plan==='monthly'?'9.99':'99.99'}</div>
+                      <div style={{fontSize:11,color:'var(--mu)'}}>per {plan==='monthly'?'month':'year'}</div>
+                    </div>
+                  </div>
+                  {plan==='yearly'&&<div style={{marginTop:8}}><span className="badge badge-grn" style={{fontSize:11}}>✓ Jackpot entry every month</span></div>}
+                </div>
+              ))}
+              <div style={{display:'flex',gap:10,marginTop:4}}>
+                <button className="btn btn-o btn-lg" style={{flex:1,justifyContent:'center'}} onClick={()=>{setStep(1);setErr('');}}>← Back</button>
+                <button className="btn btn-p btn-lg" style={{flex:1,justifyContent:'center'}} onClick={()=>setStep(3)}>Continue →</button>
+              </div>
+            </>
+          )}
+
+          {mode==='signup'&&step===3&&(
+            <>
+              <h3 style={{fontSize:16,marginBottom:4}}>Choose your charity</h3>
+              <p style={{fontSize:13,color:'var(--mu)',marginBottom:16}}>10% of your subscription goes to your chosen charity. You can adjust this anytime.</p>
+              <div style={{display:'flex',flexDirection:'column',gap:8,maxHeight:280,overflowY:'auto'}}>
+                {CHARITIES.map(c=>(
+                  <div key={c.id} onClick={()=>set('charityId',c.id)} style={{border:`2px solid ${form.charityId===c.id?'var(--grn)':'var(--bdr)'}`,borderRadius:10,padding:'12px 14px',cursor:'pointer',background:form.charityId===c.id?'var(--grnd)':'var(--surf2)',transition:'all 0.15s',display:'flex',gap:12,alignItems:'center'}}>
+                    <span style={{fontSize:24,flexShrink:0}}>{c.emoji}</span>
+                    <div>
+                      <div style={{fontWeight:500,fontSize:14}}>{c.name}</div>
+                      <div style={{fontSize:12,color:'var(--mu)',marginTop:1}}>{c.impact}</div>
+                    </div>
+                    {form.charityId===c.id&&<span style={{marginLeft:'auto',color:'var(--grn)',fontWeight:700}}>✓</span>}
+                  </div>
+                ))}
+              </div>
+              <div style={{display:'flex',gap:10,marginTop:16}}>
+                <button className="btn btn-o btn-lg" style={{flex:1,justifyContent:'center'}} onClick={()=>setStep(2)}>← Back</button>
+                <button className="btn btn-grn btn-lg" style={{flex:1,justifyContent:'center'}} onClick={handleSignup}>Create account ✓</button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ───── LANDING PAGE ───── */
+function Landing({onAuth}){
+  const steps=[
+    {n:'01',icon:'⛳',title:'Enter your scores',body:'Log your last 5 Stableford scores after each round. Each score is your ticket into the monthly draw.'},
+    {n:'02',icon:'🎯',title:'Match the draw',body:'Five numbers are drawn each month from 1–45. Match 3, 4, or all 5 of your scores to win a prize.'},
+    {n:'03',icon:'💚',title:'Drive real change',body:'10% of your subscription goes to your chosen charity. The more subscribers, the bigger the impact.'},
+  ];
+  const tiers=[
+    {label:'5 Numbers',desc:'Jackpot (rolls over)',share:'40%',color:'var(--ambl)',icon:'🏆'},
+    {label:'4 Numbers',desc:'Major prize',share:'35%',color:'var(--blu)',icon:'🥈'},
+    {label:'3 Numbers',desc:'Community prize',share:'25%',color:'var(--grn)',icon:'🥉'},
+  ];
+  return(
+    <div>
+      {/* HERO */}
+      <section className="hero">
+        <div className="hero-bg"/>
+        <div className="ctr" style={{maxWidth:700}}>
+          <div className="fu">
+            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:24}}>
+              <span className="badge badge-grn" style={{fontSize:12}}>✦ Now live in the UK</span>
+            </div>
+            <h1 style={{fontSize:'clamp(40px,7vw,72px)',fontWeight:800,lineHeight:1.05,marginBottom:20}}>
+              Every round,<br/><span className="gtext">a reason to give.</span>
+            </h1>
+            <p style={{fontSize:'clamp(15px,2vw,18px)',color:'var(--mu)',maxWidth:520,lineHeight:1.7,marginBottom:36}}>
+              ORBIT turns your Stableford scores into monthly prize draws — and puts charity at the centre of every subscription. Play golf. Drive change.
+            </p>
+            <div style={{display:'flex',gap:12,flexWrap:'wrap'}}>
+              <button className="btn btn-p btn-lg" onClick={()=>onAuth('signup')}>Start for £9.99/month →</button>
+              <button className="btn btn-o btn-lg" onClick={()=>onAuth('login')}>Sign in</button>
+            </div>
+            <p style={{marginTop:16,fontSize:12,color:'var(--mu2)'}}>Cancel anytime · Charity contribution included · Monthly draw entry</p>
+          </div>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section style={{padding:'80px 0',borderTop:'1px solid var(--bdr)'}}>
+        <div className="ctr">
+          <p style={{fontSize:12,color:'var(--amb)',fontWeight:600,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>How it works</p>
+          <h2 style={{fontSize:'clamp(24px,4vw,36px)',fontWeight:700,marginBottom:48,maxWidth:400}}>Simple as a birdie.</h2>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:24}}>
+            {steps.map((s,i)=>(
+              <div key={i} className="card" style={{position:'relative',overflow:'hidden'}}>
+                <div style={{fontSize:11,fontFamily:'Syne,sans-serif',fontWeight:700,color:'var(--mu2)',marginBottom:16,letterSpacing:1}}>{s.n}</div>
+                <div style={{fontSize:28,marginBottom:12}}>{s.icon}</div>
+                <h3 style={{fontSize:17,fontWeight:700,marginBottom:8}}>{s.title}</h3>
+                <p style={{fontSize:14,color:'var(--mu)',lineHeight:1.65}}>{s.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PRIZE TIERS */}
+      <section style={{padding:'80px 0',background:'var(--surf)',borderTop:'1px solid var(--bdr)',borderBottom:'1px solid var(--bdr)'}}>
+        <div className="ctr">
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:48,alignItems:'center'}}>
+            <div>
+              <p style={{fontSize:12,color:'var(--amb)',fontWeight:600,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>Prize pool</p>
+              <h2 style={{fontSize:'clamp(24px,4vw,34px)',fontWeight:700,marginBottom:16}}>Three ways to win every month.</h2>
+              <p style={{fontSize:14,color:'var(--mu)',lineHeight:1.7,marginBottom:24}}>60% of subscription revenue goes directly into the prize pool. Match your Stableford scores to draw numbers and claim your share. The 5-match jackpot rolls over if unclaimed — growing every month.</p>
+              <div style={{display:'flex',gap:16,flexWrap:'wrap'}}>
+                <div className="sc" style={{minWidth:110}}>
+                  <div className="sc-lbl">Active subs</div>
+                  <div className="sc-val" style={{color:'var(--amb)'}}>~100</div>
+                </div>
+                <div className="sc" style={{minWidth:110}}>
+                  <div className="sc-lbl">Monthly pool</div>
+                  <div className="sc-val" style={{color:'var(--grn)'}}>£598</div>
+                </div>
+              </div>
+            </div>
+            <div style={{display:'flex',flexDirection:'column',gap:12}}>
+              {tiers.map((t,i)=>(
+                <div key={i} style={{background:'var(--surf2)',border:'1px solid var(--bdr)',borderRadius:12,padding:'16px 20px',display:'flex',alignItems:'center',gap:16}}>
+                  <div style={{fontSize:28}}>{t.icon}</div>
+                  <div style={{flex:1}}>
+                    <div style={{fontFamily:'Syne,sans-serif',fontSize:16,fontWeight:700}}>{t.label}</div>
+                    <div style={{fontSize:13,color:'var(--mu)',marginTop:2}}>{t.desc}</div>
+                  </div>
+                  <div style={{textAlign:'right'}}>
+                    <div style={{fontFamily:'Syne,sans-serif',fontSize:22,fontWeight:700,color:t.color}}>{t.share}</div>
+                    <div style={{fontSize:11,color:'var(--mu)'}}>of pool</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CHARITIES */}
+      <section style={{padding:'80px 0'}}>
+        <div className="ctr">
+          <p style={{fontSize:12,color:'var(--grn)',fontWeight:600,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>Your impact</p>
+          <h2 style={{fontSize:'clamp(24px,4vw,34px)',fontWeight:700,marginBottom:8}}>Choose the cause you care about.</h2>
+          <p style={{fontSize:14,color:'var(--mu)',marginBottom:36}}>At least 10% of every subscription — your choice goes further, every month.</p>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:16}}>
+            {CHARITIES.map(c=>(
+              <div key={c.id} style={{background:'var(--surf)',border:'1px solid var(--bdr)',borderRadius:12,padding:'20px 18px',transition:'border-color 0.2s',cursor:'pointer'}} onMouseEnter={e=>e.currentTarget.style.borderColor='var(--grnd)'} onMouseLeave={e=>e.currentTarget.style.borderColor='var(--bdr)'}>
+                <div style={{fontSize:32,marginBottom:10}}>{c.emoji}</div>
+                <div style={{fontSize:12,color:'var(--grn)',fontWeight:600,marginBottom:6}}>{c.category}</div>
+                <div style={{fontWeight:600,fontSize:14,marginBottom:6,lineHeight:1.3}}>{c.name}</div>
+                <div style={{fontSize:12,color:'var(--mu)'}}>{c.impact}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section style={{padding:'80px 0',borderTop:'1px solid var(--bdr)',background:'var(--surf)'}}>
+        <div className="ctr" style={{textAlign:'center',maxWidth:560}}>
+          <h2 style={{fontSize:'clamp(26px,5vw,44px)',fontWeight:800,marginBottom:16}}>Ready to make your<br/><span className="gtext">rounds count?</span></h2>
+          <p style={{color:'var(--mu)',fontSize:15,marginBottom:36}}>Join ORBIT today. Monthly or yearly plans. Cancel anytime. Real charity impact from day one.</p>
+          <button className="btn btn-p btn-lg" onClick={()=>onAuth('signup')} style={{marginRight:12}}>Get started — £9.99/mo →</button>
+          <p style={{marginTop:14,fontSize:12,color:'var(--mu2)'}}>£99.99/year saves you over £19 · No hidden fees</p>
+        </div>
+      </section>
+
+      <footer style={{borderTop:'1px solid var(--bdr)',padding:'28px 0'}}>
+        <div className="ctr" style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:12}}>
+          <span className="logo" style={{fontSize:16}}>ORBIT</span>
+          <span style={{fontSize:12,color:'var(--mu2)'}}>© 2026 ORBIT For Good Ltd · A Digital Heroes sample project</span>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+/* ───── USER DASHBOARD ───── */
+function Dashboard({user,updateUser,draws,users}){
+  const [tab,setTab]=useState('overview');
+  const tabs=[
+    {k:'overview',l:'Overview'},
+    {k:'scores',l:'My Scores'},
+    {k:'charity',l:'Charity'},
+    {k:'draws',l:'Draws'},
+    {k:'winnings',l:'Winnings'},
+  ];
+  const charity=charityById(user.charity?.id);
+  const activeSubs=users.filter(u=>u.sub?.status==='active').length;
+  const pool=calcPool(activeSubs);
+  const latestDraw=draws.find(d=>d.status==='published'&&d.numbers);
+  const myMatch=latestDraw?checkMatch(user.scores,latestDraw.numbers):0;
+
+  return(
+    <div style={{minHeight:'100vh',padding:'32px 0'}}>
+      <div className="ctr">
+        <div style={{marginBottom:28}}>
+          <h1 style={{fontSize:26,fontWeight:700}}>Welcome back, {user.name.split(' ')[0]}.</h1>
+          <p style={{color:'var(--mu)',fontSize:14,marginTop:4}}>Your ORBIT dashboard</p>
+        </div>
+        <div className="tabs" style={{marginBottom:24}}>
+          {tabs.map(t=><button key={t.k} className={`tab ${tab===t.k?'on':''}`} onClick={()=>setTab(t.k)}>{t.l}</button>)}
+        </div>
+
+        {/* OVERVIEW TAB */}
+        {tab==='overview'&&(
+          <div className="fu">
+            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:14,marginBottom:28}}>
+              <div className="sc">
+                <div className="sc-lbl">Subscription</div>
+                <div className="sc-val" style={{fontSize:16,display:'flex',alignItems:'center',gap:8,marginTop:4}}>
+                  <span className={`badge ${user.sub?.status==='active'?'badge-grn':'badge-red'}`}>{user.sub?.status||'Inactive'}</span>
+                  <span style={{fontSize:13,color:'var(--mu)',fontFamily:'DM Sans',fontWeight:400,textTransform:'capitalize'}}>{user.sub?.plan}</span>
+                </div>
+              </div>
+              <div className="sc">
+                <div className="sc-lbl">Scores logged</div>
+                <div className="sc-val">{user.scores?.length||0} <span style={{fontSize:13,fontFamily:'DM Sans',color:'var(--mu)',fontWeight:400}}>/ 5</span></div>
+              </div>
+              <div className="sc">
+                <div className="sc-lbl">Total winnings</div>
+                <div className="sc-val" style={{color:'var(--amb)'}}>£{fmt2(user.winnings?.total||0)}</div>
+              </div>
+              <div className="sc">
+                <div className="sc-lbl">Charity support</div>
+                <div className="sc-val" style={{fontSize:15,marginTop:4}}>{charity?.emoji} <span style={{fontSize:14,fontFamily:'DM Sans',fontWeight:500}}>{charity?.name}</span></div>
+              </div>
+            </div>
+
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20}}>
+              <div className="card">
+                <h3 style={{fontSize:15,fontWeight:600,marginBottom:16}}>Last draw result</h3>
+                {latestDraw?(
+                  <>
+                    <div style={{color:'var(--mu)',fontSize:13,marginBottom:12}}>{latestDraw.month} draw — Numbers:</div>
+                    <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:16}}>
+                      {latestDraw.numbers.map(n=>{
+                        const hit=user.scores?.map(s=>s.score).includes(n);
+                        return <div key={n} className={`ball ${hit?'match':'rev'}`}>{n}</div>;
+                      })}
+                    </div>
+                    <div style={{fontFamily:'Syne,sans-serif',fontWeight:700,fontSize:18}}>
+                      {myMatch>=5?'🏆 Jackpot!':myMatch===4?'🥈 4-number match!':myMatch===3?'🥉 3-number match!':myMatch>0?`${myMatch} matched — keep going!`:'No match this time'}
+                    </div>
+                    {myMatch>=3&&<div className="badge badge-grn" style={{marginTop:8}}>Prize pending verification</div>}
+                  </>
+                ):<p style={{color:'var(--mu)',fontSize:14}}>No completed draws yet.</p>}
+              </div>
+              <div className="card">
+                <h3 style={{fontSize:15,fontWeight:600,marginBottom:16}}>April 2026 prize pool</h3>
+                <div style={{marginBottom:14}}>
+                  <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
+                    <span style={{fontSize:13,color:'var(--mu)'}}>🏆 Jackpot</span>
+                    <span style={{fontWeight:600}}>£{fmt2(pool.jackpot)}</span>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
+                    <span style={{fontSize:13,color:'var(--mu)'}}>🥈 4-match</span>
+                    <span style={{fontWeight:600}}>£{fmt2(pool.four)}</span>
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
+                    <span style={{fontSize:13,color:'var(--mu)'}}>🥉 3-match</span>
+                    <span style={{fontWeight:600}}>£{fmt2(pool.three)}</span>
+                  </div>
+                </div>
+                <hr className="sep"/>
+                <div style={{display:'flex',justifyContent:'space-between'}}>
+                  <span style={{fontSize:13,color:'var(--mu)'}}>Total pool</span>
+                  <span style={{fontFamily:'Syne,sans-serif',fontWeight:700,fontSize:17,color:'var(--amb)'}}>£{fmt2(pool.total)}</span>
+                </div>
+                <div style={{fontSize:12,color:'var(--mu2)',marginTop:6}}>{activeSubs} active subscribers · draw on 1 May 2026</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* SCORES TAB */}
+        {tab==='scores'&&<ScoresPanel user={user} updateUser={updateUser}/>}
+
+        {/* CHARITY TAB */}
+        {tab==='charity'&&<CharityPanel user={user} updateUser={updateUser}/>}
+
+        {/* DRAWS TAB */}
+        {tab==='draws'&&<DrawsPanel user={user} draws={draws}/>}
+
+        {/* WINNINGS TAB */}
+        {tab==='winnings'&&<WinningsPanel user={user}/>}
+      </div>
+    </div>
+  );
+}
+
+function ScoresPanel({user,updateUser}){
+  const [score,setScore]=useState('');
+  const [date,setDate]=useState(new Date().toISOString().split('T')[0]);
+  const [editId,setEditId]=useState(null);
+  const [editScore,setEditScore]=useState('');
+
+  function addScore(){
+    const s=parseInt(score);
+    if(isNaN(s)||s<1||s>45){toast('Score must be between 1 and 45.','err');return;}
+    const existing=user.scores||[];
+    if(existing.find(x=>x.date===date)){toast('A score already exists for this date. Edit or delete the existing one.','err');return;}
+    let newScores=[{id:`sc${Date.now()}`,score:s,date},... existing];
+    newScores=newScores.sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
+    updateUser({...user,scores:newScores});
+    setScore('');toast('Score logged! ⛳','ok');
+  }
+
+  function deleteScore(id){
+    const newScores=(user.scores||[]).filter(x=>x.id!==id);
+    updateUser({...user,scores:newScores});
+    toast('Score removed.','info');
+  }
+
+  function saveEdit(id){
+    const s=parseInt(editScore);
+    if(isNaN(s)||s<1||s>45){toast('Score must be between 1 and 45.','err');return;}
+    const newScores=(user.scores||[]).map(x=>x.id===id?{...x,score:s}:x);
+    updateUser({...user,scores:newScores});
+    setEditId(null);toast('Score updated.','ok');
+  }
+
+  const scores=user.scores||[];
+  return(
+    <div className="fu">
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20}}>
+        <div className="card">
+          <h3 style={{fontSize:15,fontWeight:600,marginBottom:4}}>Log a new score</h3>
+          <p style={{fontSize:13,color:'var(--mu)',marginBottom:16}}>Enter a Stableford score (1–45). Only one score per date is allowed.</p>
+          <div className="fg">
+            <label>Stableford score</label>
+            <input type="number" min="1" max="45" placeholder="e.g. 32" value={score} onChange={e=>setScore(e.target.value)}/>
+          </div>
+          <div className="fg">
+            <label>Date played</label>
+            <input type="date" value={date} onChange={e=>setDate(e.target.value)} max={new Date().toISOString().split('T')[0]}/>
+          </div>
+          <button className="btn btn-p" style={{width:'100%',justifyContent:'center'}} onClick={addScore}>Add score ⛳</button>
+          {scores.length>=5&&<p style={{fontSize:12,color:'var(--amb)',marginTop:10}}>⚠ You have 5 scores. Adding a new one will replace the oldest.</p>}
+        </div>
+        <div className="card">
+          <h3 style={{fontSize:15,fontWeight:600,marginBottom:4}}>Your score history</h3>
+          <p style={{fontSize:13,color:'var(--mu)',marginBottom:16}}>Last 5 rounds · Most recent first</p>
+          {scores.length===0?(
+            <div style={{textAlign:'center',padding:'30px 0',color:'var(--mu)'}}>
+              <div style={{fontSize:32,marginBottom:10}}>⛳</div>
+              <div style={{fontSize:14}}>No scores yet. Log your first round!</div>
+            </div>
+          ):(
+            <div style={{display:'flex',flexDirection:'column',gap:8}}>
+              {scores.map((s,i)=>(
+                <div key={s.id} style={{background:'var(--surf2)',border:'1px solid var(--bdr)',borderRadius:10,padding:'12px 14px',display:'flex',alignItems:'center',gap:12}}>
+                  <div style={{fontFamily:'Syne,sans-serif',fontSize:26,fontWeight:700,color:'var(--amb)',width:44,textAlign:'center'}}>{s.score}</div>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:14,fontWeight:500}}>{fmtDate(s.date)}</div>
+                    <div style={{fontSize:12,color:'var(--mu)'}}>Round {scores.length-i}</div>
+                  </div>
+                  {editId===s.id?(
+                    <div style={{display:'flex',gap:6,alignItems:'center'}}>
+                      <input type="number" min="1" max="45" value={editScore} onChange={e=>setEditScore(e.target.value)} style={{width:60,textAlign:'center',padding:'5px 8px'}}/>
+                      <button className="btn btn-grn btn-sm" onClick={()=>saveEdit(s.id)}>✓</button>
+                      <button className="btn btn-g btn-sm" onClick={()=>setEditId(null)}>✕</button>
+                    </div>
+                  ):(
+                    <div style={{display:'flex',gap:6}}>
+                      <button className="btn btn-o btn-sm" onClick={()=>{setEditId(s.id);setEditScore(s.score);}}>Edit</button>
+                      <button className="btn btn-red btn-sm" onClick={()=>deleteScore(s.id)}>✕</button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CharityPanel({user,updateUser}){
+  const [sel,setSel]=useState(user.charity?.id||'c1');
+  const [pct,setPct]=useState(user.charity?.pct||10);
+
+  function save(){
+    updateUser({...user,charity:{id:sel,pct}});
+    toast('Charity preference saved. 💚','ok');
+  }
+
+  const ch=charityById(sel);
+  const fee=subFee(user.sub?.plan);
+  const charityAmt=(fee*pct/100).toFixed(2);
+  const drawAmt=(fee*0.60).toFixed(2);
+
+  return(
+    <div className="fu" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20}}>
+      <div className="card">
+        <h3 style={{fontSize:15,fontWeight:600,marginBottom:4}}>Select your charity</h3>
+        <p style={{fontSize:13,color:'var(--mu)',marginBottom:16}}>You can change your charity at any time. The change takes effect from your next billing cycle.</p>
+        <div style={{display:'flex',flexDirection:'column',gap:8,maxHeight:380,overflowY:'auto'}}>
+          {CHARITIES.map(c=>(
+            <div key={c.id} onClick={()=>setSel(c.id)} style={{border:`2px solid ${sel===c.id?'var(--grn)':'var(--bdr)'}`,borderRadius:10,padding:'12px 14px',cursor:'pointer',background:sel===c.id?'var(--grnd)':'var(--surf2)',transition:'all 0.15s',display:'flex',gap:12,alignItems:'center'}}>
+              <span style={{fontSize:24}}>{c.emoji}</span>
+              <div style={{flex:1}}>
+                <div style={{fontWeight:500,fontSize:14}}>{c.name}</div>
+                <div style={{fontSize:12,color:'var(--mu)',marginTop:1}}>{c.impact}</div>
+              </div>
+              {sel===c.id&&<span style={{color:'var(--grn)',fontWeight:700}}>✓</span>}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div>
+        <div className="card" style={{marginBottom:16}}>
+          <h3 style={{fontSize:15,fontWeight:600,marginBottom:4}}>Your contribution</h3>
+          <p style={{fontSize:13,color:'var(--mu)',marginBottom:20}}>Minimum 10%. Increase anytime to boost your impact.</p>
+          <div style={{marginBottom:8,display:'flex',justifyContent:'space-between'}}>
+            <label style={{display:'inline',marginBottom:0}}>Charity %</label>
+            <span style={{fontFamily:'Syne,sans-serif',fontWeight:700,fontSize:18,color:'var(--grn)'}}>{pct}%</span>
+          </div>
+          <input type="range" min="10" max="50" step="1" value={pct} onChange={e=>setPct(+e.target.value)} style={{marginBottom:20}}/>
+          <div style={{background:'var(--surf2)',borderRadius:10,padding:14}}>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+              <span style={{fontSize:13,color:'var(--mu)'}}>Monthly fee ({user.sub?.plan})</span>
+              <span style={{fontWeight:500}}>£{fmt2(fee)}</span>
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+              <span style={{fontSize:13,color:'var(--grn)'}}>💚 {ch?.name}</span>
+              <span style={{fontWeight:500,color:'var(--grn)'}}>£{charityAmt}</span>
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+              <span style={{fontSize:13,color:'var(--mu)'}}>🎯 Prize pool</span>
+              <span style={{fontWeight:500}}>£{drawAmt}</span>
+            </div>
+          </div>
+          <button className="btn btn-grn" style={{width:'100%',justifyContent:'center',marginTop:16}} onClick={save}>Save preferences ✓</button>
+        </div>
+        <div className="card">
+          <div style={{fontSize:28,marginBottom:8}}>{ch?.emoji}</div>
+          <h3 style={{fontSize:15,fontWeight:600,marginBottom:6}}>{ch?.name}</h3>
+          <p style={{fontSize:13,color:'var(--mu)',lineHeight:1.65,marginBottom:10}}>{ch?.desc}</p>
+          <span className="badge badge-grn">{ch?.impact}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DrawsPanel({user,draws}){
+  const upcoming=draws.find(d=>d.status==='pending');
+  const past=draws.filter(d=>d.status==='published').reverse();
+  return(
+    <div className="fu">
+      <div className="card" style={{marginBottom:20}}>
+        <h3 style={{fontSize:15,fontWeight:600,marginBottom:4}}>Upcoming draw</h3>
+        <p style={{fontSize:13,color:'var(--mu)',marginBottom:16}}>April 2026 · Draw date: 1 May 2026</p>
+        <div style={{display:'flex',gap:8,marginBottom:14}}>
+          {(user.scores||[]).slice(0,5).map((s,i)=>(
+            <div key={s.id} style={{background:'var(--ambd)',border:'1px solid rgba(232,160,32,0.3)',borderRadius:10,padding:'10px 14px',textAlign:'center'}}>
+              <div style={{fontFamily:'Syne,sans-serif',fontSize:22,fontWeight:700,color:'var(--amb)'}}>{s.score}</div>
+              <div style={{fontSize:10,color:'var(--mu)',marginTop:2}}>{fmtShort(s.date)}</div>
+            </div>
+          ))}
+          {(user.scores||[]).length<5&&Array.from({length:5-(user.scores||[]).length}).map((_,i)=>(
+            <div key={i} style={{background:'var(--surf2)',border:'1px dashed var(--bdr2)',borderRadius:10,padding:'10px 14px',textAlign:'center',opacity:0.5}}>
+              <div style={{fontFamily:'Syne,sans-serif',fontSize:22,fontWeight:700,color:'var(--mu2)'}}>?</div>
+              <div style={{fontSize:10,color:'var(--mu2)',marginTop:2}}>needed</div>
+            </div>
+          ))}
+        </div>
+        {(user.scores||[]).length<5?(
+          <div style={{background:'var(--ambd)',border:'1px solid rgba(232,160,32,0.25)',borderRadius:8,padding:'10px 14px',fontSize:13,color:'var(--amb)'}}>
+            ⚠ You need {5-(user.scores||[]).length} more score(s) to enter the draw.
+          </div>
+        ):(
+          <div style={{background:'var(--grnd)',border:'1px solid rgba(29,190,139,0.25)',borderRadius:8,padding:'10px 14px',fontSize:13,color:'var(--grn)'}}>
+            ✓ All 5 scores logged — you're entered into the April 2026 draw!
+          </div>
+        )}
+      </div>
+      <h3 style={{fontSize:15,fontWeight:600,marginBottom:14}}>Past draws</h3>
+      <div style={{display:'flex',flexDirection:'column',gap:12}}>
+        {past.map(draw=>{
+          const myResult=(user.drawResults||[]).find(r=>r.drawId===draw.id);
+          const matched=myResult?myResult.matched:checkMatch(user.scores,draw.numbers);
+          return(
+            <div key={draw.id} className="card">
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
+                <div>
+                  <div style={{fontWeight:600,fontSize:15}}>{draw.month}</div>
+                  <div style={{fontSize:13,color:'var(--mu)',marginTop:2}}>Draw numbers</div>
+                </div>
+                {myResult&&(
+                  <div>
+                    {myResult.matched>=3?(
+                      <span className="badge badge-grn">{myResult.matched}-match • £{fmt2(myResult.prize)}</span>
+                    ):(
+                      <span className="badge badge-mu">No match</span>
+                    )}
+                    {myResult.verifyStatus&&<div style={{marginTop:4}}><span className={`badge ${myResult.verifyStatus==='paid'?'badge-grn':'badge-amb'}`}>{myResult.verifyStatus}</span></div>}
+                  </div>
+                )}
+              </div>
+              <div style={{display:'flex',gap:8}}>
+                {draw.numbers.map(n=>(
+                  <div key={n} className={`ball rev`} style={{width:42,height:42,fontSize:15}}>{n}</div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function WinningsPanel({user}){
+  const w=user.winnings||{};
+  const results=(user.drawResults||[]).filter(r=>r.prize>0);
+  return(
+    <div className="fu">
+      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:14,marginBottom:24}}>
+        <div className="sc"><div className="sc-lbl">Total won</div><div className="sc-val" style={{color:'var(--amb)'}}>£{fmt2(w.total||0)}</div></div>
+        <div className="sc"><div className="sc-lbl">Pending payout</div><div className="sc-val" style={{color:'var(--mu)'}}>{w.pending>0?`£${fmt2(w.pending)}`:'—'}</div></div>
+        <div className="sc"><div className="sc-lbl">Paid out</div><div className="sc-val" style={{color:'var(--grn)'}}>£{fmt2(w.paid||0)}</div></div>
+      </div>
+      <div className="card">
+        <h3 style={{fontSize:15,fontWeight:600,marginBottom:16}}>Winnings history</h3>
+        {results.length===0?(
+          <div style={{textAlign:'center',padding:'30px 0',color:'var(--mu)'}}>
+            <div style={{fontSize:32,marginBottom:10}}>🏌️</div>
+            <div style={{fontSize:14}}>No prizes yet — keep playing!</div>
+            <div style={{fontSize:13,color:'var(--mu2)',marginTop:6}}>Match 3, 4, or 5 draw numbers to win.</div>
+          </div>
+        ):(
+          <table>
+            <thead><tr><th>Draw</th><th>Match</th><th>Prize</th><th>Status</th></tr></thead>
+            <tbody>
+              {results.map((r,i)=>(
+                <tr key={i}>
+                  <td style={{fontWeight:500}}>{r.drawId==='d1'?'February 2026':r.drawId==='d2'?'March 2026':'April 2026'}</td>
+                  <td><span className="badge badge-amb">{r.matched}-number match</span></td>
+                  <td style={{fontFamily:'Syne,sans-serif',fontWeight:700,color:'var(--amb)'}}>£{fmt2(r.prize)}</td>
+                  <td><span className={`badge ${r.verifyStatus==='paid'?'badge-grn':r.verifyStatus==='pending'?'badge-amb':'badge-mu'}`}>{r.verifyStatus||'—'}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ───── CHARITIES PAGE ───── */
+function CharitiesPage({user,updateUser}){
+  const [sel,setSel]=useState(user?.charity?.id);
+  function pick(id){
+    if(!user){toast('Sign in to select a charity.','info');return;}
+    setSel(id);
+    updateUser({...user,charity:{...user.charity,id}});
+    toast(`${charityById(id).name} selected as your charity! 💚`,'ok');
+  }
+  return(
+    <div style={{minHeight:'100vh',padding:'48px 0'}}>
+      <div className="ctr">
+        <p style={{fontSize:12,color:'var(--grn)',fontWeight:600,letterSpacing:1,textTransform:'uppercase',marginBottom:10}}>Charity directory</p>
+        <h1 style={{fontSize:32,fontWeight:700,marginBottom:8}}>The causes you support.</h1>
+        <p style={{color:'var(--mu)',marginBottom:36}}>Every ORBIT subscription channels a portion to real-world change. Explore our charity partners and choose yours.</p>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:20}}>
+          {CHARITIES.map(c=>(
+            <div key={c.id} style={{background:'var(--surf)',border:`2px solid ${sel===c.id?'var(--grn)':'var(--bdr)'}`,borderRadius:14,overflow:'hidden',transition:'all 0.2s',cursor:'pointer'}} onClick={()=>pick(c.id)}>
+              <div style={{background:'var(--surf2)',padding:'28px 24px 20px',borderBottom:'1px solid var(--bdr)'}}>
+                <div style={{fontSize:40,marginBottom:10}}>{c.emoji}</div>
+                <div style={{fontSize:11,color:'var(--grn)',fontWeight:600,letterSpacing:0.5,textTransform:'uppercase',marginBottom:6}}>{c.category}</div>
+                <h3 style={{fontSize:17,fontWeight:700,marginBottom:6}}>{c.name}</h3>
+                <p style={{fontSize:13,color:'var(--mu)',lineHeight:1.6}}>{c.desc}</p>
+              </div>
+              <div style={{padding:'14px 24px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <div>
+                  <div style={{fontSize:12,color:'var(--mu)'}}>Impact so far</div>
+                  <div style={{fontWeight:600,fontSize:14,marginTop:2}}>{c.impact}</div>
+                </div>
+                {sel===c.id?(
+                  <span className="badge badge-grn">✓ Your charity</span>
+                ):(
+                  <button className="btn btn-o btn-sm" onClick={e=>{e.stopPropagation();pick(c.id);}}>Select</button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ───── ADMIN DASHBOARD ───── */
+function AdminPanel({users,setUsers,draws,setDraws}){
+  const [tab,setTab]=useState('users');
+  const tabs=[
+    {k:'users',l:'Users'},
+    {k:'draws',l:'Draw Manager'},
+    {k:'charities',l:'Charities'},
+    {k:'winners',l:'Winners'},
+    {k:'reports',l:'Reports'},
+  ];
+  const activeSubs=users.filter(u=>u.sub?.status==='active').length;
+  const totalPool=calcPool(activeSubs);
+
+  return(
+    <div style={{minHeight:'100vh',padding:'32px 0'}}>
+      <div className="ctr">
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:28,flexWrap:'wrap',gap:12}}>
+          <div>
+            <h1 style={{fontSize:24,fontWeight:700}}>Admin Dashboard ✦</h1>
+            <p style={{color:'var(--mu)',fontSize:13,marginTop:3}}>ORBIT platform management</p>
+          </div>
+          <div style={{display:'flex',gap:10}}>
+            <div className="sc" style={{textAlign:'center',minWidth:100}}><div className="sc-lbl">Subscribers</div><div className="sc-val" style={{color:'var(--amb)'}}>{activeSubs}</div></div>
+            <div className="sc" style={{textAlign:'center',minWidth:100}}><div className="sc-lbl">Prize pool</div><div className="sc-val" style={{color:'var(--grn)',fontSize:16}}>£{fmt2(totalPool.total)}</div></div>
+          </div>
+        </div>
+        <div className="tabs" style={{marginBottom:24}}>
+          {tabs.map(t=><button key={t.k} className={`tab ${tab===t.k?'on':''}`} onClick={()=>setTab(t.k)}>{t.l}</button>)}
+        </div>
+        {tab==='users'&&<AdminUsers users={users} setUsers={setUsers}/>}
+        {tab==='draws'&&<AdminDraws users={users} draws={draws} setDraws={setDraws}/>}
+        {tab==='charities'&&<AdminCharities/>}
+        {tab==='winners'&&<AdminWinners users={users} setUsers={setUsers} draws={draws}/>}
+        {tab==='reports'&&<AdminReports users={users} draws={draws}/>}
+      </div>
+    </div>
+  );
+}
+
+function AdminUsers({users,setUsers}){
+  const [editId,setEditId]=useState(null);
+  const [editName,setEditName]=useState('');
+  const [editPlan,setEditPlan]=useState('');
+  const [editStatus,setEditStatus]=useState('');
+
+  function startEdit(u){setEditId(u.id);setEditName(u.name);setEditPlan(u.sub?.plan||'monthly');setEditStatus(u.sub?.status||'active');}
+  function saveEdit(){
+    setUsers(prev=>prev.map(u=>u.id===editId?{...u,name:editName,sub:{...u.sub,plan:editPlan,status:editStatus}}:u));
+    setEditId(null);toast('User updated.','ok');
+  }
+  function deleteUser(id){
+    if(!confirm('Delete this user?'))return;
+    setUsers(prev=>prev.filter(u=>u.id!==id));
+    toast('User deleted.','ok');
+  }
+
+  return(
+    <div className="fu">
+      <div className="card">
+        <h3 style={{fontSize:15,fontWeight:600,marginBottom:16}}>All users ({users.length})</h3>
+        <div style={{overflowX:'auto'}}>
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Plan</th><th>Status</th><th>Scores</th><th>Role</th><th>Actions</th></tr></thead>
+            <tbody>
+              {users.map(u=>(
+                <tr key={u.id}>
+                  <td>
+                    {editId===u.id?(
+                      <input value={editName} onChange={e=>setEditName(e.target.value)} style={{padding:'5px 8px',fontSize:13}}/>
+                    ):(
+                      <span style={{fontWeight:500}}>{u.name}</span>
+                    )}
+                  </td>
+                  <td style={{color:'var(--mu)',fontSize:13}}>{u.email}</td>
+                  <td>
+                    {editId===u.id?(
+                      <select value={editPlan} onChange={e=>setEditPlan(e.target.value)} style={{padding:'4px 8px',fontSize:13,width:'auto'}}>
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
+                      </select>
+                    ):(
+                      <span className="badge badge-mu" style={{textTransform:'capitalize'}}>{u.sub?.plan}</span>
+                    )}
+                  </td>
+                  <td>
+                    {editId===u.id?(
+                      <select value={editStatus} onChange={e=>setEditStatus(e.target.value)} style={{padding:'4px 8px',fontSize:13,width:'auto'}}>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                    ):(
+                      <span className={`badge ${u.sub?.status==='active'?'badge-grn':'badge-red'}`}>{u.sub?.status}</span>
+                    )}
+                  </td>
+                  <td style={{fontWeight:600}}>{u.scores?.length||0}/5</td>
+                  <td><span className={`badge ${u.role==='admin'?'badge-amb':'badge-mu'}`}>{u.role}</span></td>
+                  <td>
+                    {editId===u.id?(
+                      <div style={{display:'flex',gap:6}}>
+                        <button className="btn btn-grn btn-sm" onClick={saveEdit}>Save</button>
+                        <button className="btn btn-g btn-sm" onClick={()=>setEditId(null)}>Cancel</button>
+                      </div>
+                    ):(
+                      <div style={{display:'flex',gap:6}}>
+                        <button className="btn btn-o btn-sm" onClick={()=>startEdit(u)}>Edit</button>
+                        {u.role!=='admin'&&<button className="btn btn-red btn-sm" onClick={()=>deleteUser(u.id)}>✕</button>}
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AdminDraws({users,draws,setDraws}){
+  const [drawNums,setDrawNums]=useState(null);
+  const [simulating,setSimulating]=useState(false);
+  const [revealIdx,setRevealIdx]=useState(-1);
+  const [mode,setMode]=useState('random');
+  const activeSubs=users.filter(u=>u.sub?.status==='active').length;
+  const pool=calcPool(activeSubs);
+  const pendingDraw=draws.find(d=>d.status==='pending');
+
+  function simulate(){
+    setSimulating(true);
+    setRevealIdx(-1);
+    let nums;
+    if(mode==='weighted'){
+      // Weight by most common scores
+      const allScores=users.filter(u=>u.sub?.status==='active').flatMap(u=>u.scores?.map(s=>s.score)||[]);
+      const freq={};
+      allScores.forEach(s=>{freq[s]=(freq[s]||0)+1;});
+      // Pick top 5 most frequent
+      const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]);
+      const pool=sorted.map(([k])=>+k);
+      const picked=new Set();
+      let i=0;
+      while(picked.size<5&&i<pool.length){picked.add(pool[i]);i++;}
+      while(picked.size<5)picked.add(ri(1,45));
+      nums=Array.from(picked).sort((a,b)=>a-b);
+    }else{
+      nums=genDrawNums();
+    }
+    setDrawNums(nums);
+    nums.forEach((_,i)=>{
+      setTimeout(()=>setRevealIdx(i),600+(i*500));
+    });
+    setTimeout(()=>setSimulating(false),600+nums.length*500+200);
+  }
+
+  function publish(){
+    if(!drawNums){toast('Run a simulation first.','err');return;}
+    setDraws(prev=>prev.map(d=>d.status==='pending'?{...d,numbers:drawNums,status:'published',prizePool:pool}:d));
+    toast('Draw published! Winners notified. 🎉','ok');
+    setDrawNums(null);setRevealIdx(-1);
+  }
+
+  return(
+    <div className="fu">
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20}}>
+        <div className="card">
+          <h3 style={{fontSize:15,fontWeight:600,marginBottom:4}}>April 2026 draw</h3>
+          <p style={{fontSize:13,color:'var(--mu)',marginBottom:16}}>Configure and simulate the monthly draw before publishing.</p>
+          <div className="fg">
+            <label>Draw mode</label>
+            <select value={mode} onChange={e=>setMode(e.target.value)}>
+              <option value="random">Random — standard lottery draw</option>
+              <option value="weighted">Algorithmic — weighted by most frequent scores</option>
+            </select>
+          </div>
+          <div style={{background:'var(--surf2)',borderRadius:10,padding:14,marginBottom:16}}>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}><span style={{fontSize:13,color:'var(--mu)'}}>Active subscribers</span><span style={{fontWeight:600}}>{activeSubs}</span></div>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}><span style={{fontSize:13,color:'var(--mu)'}}>Jackpot (5-match)</span><span style={{fontWeight:600,color:'var(--amb)'}}>£{fmt2(pool.jackpot)}</span></div>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}><span style={{fontSize:13,color:'var(--mu)'}}>4-match prize</span><span style={{fontWeight:600}}>£{fmt2(pool.four)}</span></div>
+            <div style={{display:'flex',justifyContent:'space-between'}}><span style={{fontSize:13,color:'var(--mu)'}}>3-match prize</span><span style={{fontWeight:600}}>£{fmt2(pool.three)}</span></div>
+          </div>
+          <div style={{display:'flex',gap:10}}>
+            <button className="btn btn-o" style={{flex:1,justifyContent:'center'}} onClick={simulate} disabled={simulating}>{simulating?'Drawing...':'Run simulation'}</button>
+            <button className="btn btn-p" style={{flex:1,justifyContent:'center'}} onClick={publish} disabled={!drawNums||simulating}>Publish draw ✦</button>
+          </div>
+        </div>
+        <div className="card">
+          <h3 style={{fontSize:15,fontWeight:600,marginBottom:16}}>Draw result {drawNums?'(simulation)':''}</h3>
+          <div style={{display:'flex',gap:10,justifyContent:'center',marginBottom:20,minHeight:60,alignItems:'center'}}>
+            {drawNums?drawNums.map((n,i)=>(
+              <div key={n} className={`ball ${i<=revealIdx?'rev':''}`}>{i<=revealIdx?n:'?'}</div>
+            )):(
+              <div style={{color:'var(--mu2)',fontSize:14,textAlign:'center'}}>
+                <div style={{fontSize:32,marginBottom:8}}>🎯</div>
+                Run a simulation to preview the draw numbers.
+              </div>
+            )}
+          </div>
+          {drawNums&&revealIdx>=4&&(
+            <div className="fu">
+              <hr className="sep"/>
+              <h4 style={{fontSize:14,fontWeight:600,marginBottom:12}}>Preliminary results</h4>
+              {users.filter(u=>u.sub?.status==='active'&&(u.scores||[]).length===5).map(u=>{
+                const m=checkMatch(u.scores,drawNums);
+                if(m<3)return null;
+                return(
+                  <div key={u.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 0',borderBottom:'1px solid var(--bdr)'}}>
+                    <span style={{fontSize:14,fontWeight:500}}>{u.name}</span>
+                    <span className={`badge ${m>=5?'badge-amb':m===4?'badge-blu':'badge-grn'}`}>{m}-match {m>=5?'🏆':m===4?'🥈':'🥉'}</span>
+                  </div>
+                );
+              })}
+              {users.filter(u=>u.sub?.status==='active'&&(u.scores||[]).length===5&&checkMatch(u.scores,drawNums)>=3).length===0&&(
+                <p style={{fontSize:14,color:'var(--mu)'}}>No winners this draw — jackpot rolls over.</p>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+      <div style={{marginTop:20}}>
+        <h3 style={{fontSize:15,fontWeight:600,marginBottom:14}}>Draw history</h3>
+        <div style={{display:'flex',flexDirection:'column',gap:10}}>
+          {draws.map(d=>(
+            <div key={d.id} style={{background:'var(--surf2)',border:'1px solid var(--bdr)',borderRadius:10,padding:'14px 16px',display:'flex',alignItems:'center',gap:16,flexWrap:'wrap'}}>
+              <div style={{minWidth:130}}>
+                <div style={{fontWeight:600,fontSize:14}}>{d.month}</div>
+                <span className={`badge ${d.status==='published'?'badge-grn':'badge-amb'}`} style={{marginTop:4}}>{d.status}</span>
+              </div>
+              <div style={{display:'flex',gap:6}}>
+                {d.numbers?d.numbers.map(n=><div key={n} className="ball rev" style={{width:36,height:36,fontSize:13}}>{n}</div>):<span style={{color:'var(--mu)',fontSize:13}}>Not drawn yet</span>}
+              </div>
+              {d.prizePool?.total>0&&<div style={{marginLeft:'auto',textAlign:'right'}}><div style={{fontSize:12,color:'var(--mu)'}}>Prize pool</div><div style={{fontWeight:700,fontFamily:'Syne,sans-serif',color:'var(--amb)'}}>£{fmt2(d.prizePool.total)}</div></div>}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AdminCharities(){
+  const [charities,setCharities]=useState(CHARITIES);
+  const [newC,setNewC]=useState({name:'',emoji:'💛',desc:'',category:'Humanitarian',impact:''});
+  const [adding,setAdding]=useState(false);
+
+  function add(){
+    if(!newC.name||!newC.desc){toast('Name and description required.','err');return;}
+    const id=`c${Date.now()}`;
+    setCharities(prev=>[...prev,{...newC,id}]);
+    setNewC({name:'',emoji:'💛',desc:'',category:'Humanitarian',impact:''});
+    setAdding(false);
+    toast('Charity added! 💚','ok');
+  }
+  function remove(id){
+    if(!confirm('Remove this charity?'))return;
+    setCharities(prev=>prev.filter(c=>c.id!==id));
+    toast('Charity removed.','info');
+  }
+
+  return(
+    <div className="fu">
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
+        <h3 style={{fontSize:15,fontWeight:600}}>Charity listings ({charities.length})</h3>
+        <button className="btn btn-grn btn-sm" onClick={()=>setAdding(x=>!x)}>{adding?'Cancel':'+ Add charity'}</button>
+      </div>
+      {adding&&(
+        <div className="card fu" style={{marginBottom:16}}>
+          <h4 style={{fontSize:14,fontWeight:600,marginBottom:14}}>New charity</h4>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+            <div className="fg"><label>Charity name</label><input value={newC.name} onChange={e=>setNewC(p=>({...p,name:e.target.value}))}/></div>
+            <div className="fg"><label>Emoji icon</label><input value={newC.emoji} onChange={e=>setNewC(p=>({...p,emoji:e.target.value}))}/></div>
+            <div className="fg"><label>Category</label>
+              <select value={newC.category} onChange={e=>setNewC(p=>({...p,category:e.target.value}))}>
+                <option>Humanitarian</option><option>Health</option><option>Environment</option><option>Education</option>
+              </select>
+            </div>
+            <div className="fg"><label>Impact stat</label><input value={newC.impact} onChange={e=>setNewC(p=>({...p,impact:e.target.value}))}/></div>
+          </div>
+          <div className="fg"><label>Description</label><textarea value={newC.desc} onChange={e=>setNewC(p=>({...p,desc:e.target.value}))} rows={2}/></div>
+          <button className="btn btn-grn" onClick={add}>Add charity</button>
+        </div>
+      )}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))',gap:14}}>
+        {charities.map(c=>(
+          <div key={c.id} className="card">
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:10}}>
+              <div style={{fontSize:28}}>{c.emoji}</div>
+              <button className="btn btn-red btn-sm" onClick={()=>remove(c.id)}>Remove</button>
+            </div>
+            <div style={{fontSize:11,color:'var(--grn)',fontWeight:600,marginBottom:4}}>{c.category}</div>
+            <div style={{fontWeight:600,marginBottom:4}}>{c.name}</div>
+            <div style={{fontSize:13,color:'var(--mu)',marginBottom:8,lineHeight:1.5}}>{c.desc}</div>
+            <span className="badge badge-grn">{c.impact}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AdminWinners({users,setUsers,draws}){
+  const winners=users.flatMap(u=>(u.drawResults||[]).filter(r=>r.prize>0).map(r=>({...r,user:u})));
+  function updateStatus(userId,drawId,status){
+    setUsers(prev=>prev.map(u=>{
+      if(u.id!==userId)return u;
+      return{...u,
+        drawResults:(u.drawResults||[]).map(r=>r.drawId===drawId?{...r,verifyStatus:status}:r),
+        winnings:status==='paid'?{...u.winnings,pending:0,paid:(u.winnings?.paid||0)+(u.drawResults||[]).find(r=>r.drawId===drawId)?.prize||0}:u.winnings
+      };
+    }));
+    toast(status==='paid'?'Payout marked as paid ✓':'Status updated.','ok');
+  }
+  return(
+    <div className="fu">
+      <div className="card">
+        <h3 style={{fontSize:15,fontWeight:600,marginBottom:16}}>Winners & verification</h3>
+        {winners.length===0?(
+          <p style={{color:'var(--mu)',fontSize:14}}>No winners to display.</p>
+        ):(
+          <table>
+            <thead><tr><th>Winner</th><th>Draw</th><th>Match</th><th>Prize</th><th>Verified</th><th>Actions</th></tr></thead>
+            <tbody>
+              {winners.map((w,i)=>(
+                <tr key={i}>
+                  <td style={{fontWeight:500}}>{w.user.name}</td>
+                  <td style={{color:'var(--mu)',fontSize:13}}>{w.drawId==='d1'?'Feb 2026':w.drawId==='d2'?'Mar 2026':'Apr 2026'}</td>
+                  <td><span className={`badge ${w.matched>=5?'badge-amb':w.matched===4?'badge-blu':'badge-grn'}`}>{w.matched}-match</span></td>
+                  <td style={{fontFamily:'Syne,sans-serif',fontWeight:700,color:'var(--amb)'}}>£{fmt2(w.prize)}</td>
+                  <td><span className={`badge ${w.user.verified?'badge-grn':'badge-red'}`}>{w.user.verified?'Verified':'Unverified'}</span></td>
+                  <td>
+                    <div style={{display:'flex',gap:6}}>
+                      {!w.user.verified&&<button className="btn btn-o btn-sm" onClick={()=>{setUsers(p=>p.map(u=>u.id===w.user.id?{...u,verified:true}:u));toast('User verified ✓','ok');}}>Verify</button>}
+                      {w.verifyStatus!=='paid'&&<button className="btn btn-grn btn-sm" onClick={()=>updateStatus(w.user.id,w.drawId,'paid')}>Mark paid</button>}
+                      {w.verifyStatus==='paid'&&<span className="badge badge-grn">✓ Paid</span>}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function AdminReports({users,draws}){
+  const active=users.filter(u=>u.sub?.status==='active').length;
+  const inactive=users.filter(u=>u.sub?.status==='inactive').length;
+  const monthly=users.filter(u=>u.sub?.plan==='monthly'&&u.sub?.status==='active').length;
+  const yearly=users.filter(u=>u.sub?.plan==='yearly'&&u.sub?.status==='active').length;
+  const totalWon=users.reduce((a,u)=>a+(u.winnings?.total||0),0);
+  const totalCharity=users.filter(u=>u.sub?.status==='active').reduce((a,u)=>{
+    const fee=subFee(u.sub?.plan);const pct=(u.charity?.pct||10)/100;
+    return a+fee*pct;
+  },0);
+  const pool=calcPool(active);
+  const published=draws.filter(d=>d.status==='published').length;
+
+  const charityBreakdown=CHARITIES.map(c=>{
+    const count=users.filter(u=>u.charity?.id===c.id&&u.sub?.status==='active').length;
+    return{...c,count,total:users.filter(u=>u.charity?.id===c.id&&u.sub?.status==='active').reduce((a,u)=>a+(subFee(u.sub?.plan)*((u.charity?.pct||10)/100)),0)};
+  }).filter(c=>c.count>0).sort((a,b)=>b.count-a.count);
+
+  return(
+    <div className="fu">
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:14,marginBottom:24}}>
+        <div className="sc"><div className="sc-lbl">Total users</div><div className="sc-val" style={{color:'var(--tx)'}}>{users.length}</div></div>
+        <div className="sc"><div className="sc-lbl">Active subs</div><div className="sc-val" style={{color:'var(--grn)'}}>{active}</div></div>
+        <div className="sc"><div className="sc-lbl">Monthly prize pool</div><div className="sc-val" style={{color:'var(--amb)',fontSize:17}}>£{fmt2(pool.total)}</div></div>
+        <div className="sc"><div className="sc-lbl">Total paid out</div><div className="sc-val" style={{color:'var(--amb)',fontSize:17}}>£{fmt2(totalWon)}</div></div>
+        <div className="sc"><div className="sc-lbl">Charity contributions</div><div className="sc-val" style={{color:'var(--grn)',fontSize:17}}>£{fmt2(totalCharity)}/mo</div></div>
+        <div className="sc"><div className="sc-lbl">Draws completed</div><div className="sc-val" style={{color:'var(--tx)'}}>{published}</div></div>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20}}>
+        <div className="card">
+          <h3 style={{fontSize:15,fontWeight:600,marginBottom:16}}>Subscription breakdown</h3>
+          <div style={{marginBottom:12}}>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}><span style={{fontSize:14}}>Monthly plan</span><span style={{fontWeight:600}}>{monthly}</span></div>
+            <div className="pbar"><div className="pfill" style={{width:`${active?monthly/active*100:0}%`,background:'var(--amb)'}}/></div>
+          </div>
+          <div style={{marginBottom:12}}>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}><span style={{fontSize:14}}>Yearly plan</span><span style={{fontWeight:600}}>{yearly}</span></div>
+            <div className="pbar"><div className="pfill" style={{width:`${active?yearly/active*100:0}%`,background:'var(--grn)'}}/></div>
+          </div>
+          <div>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}><span style={{fontSize:14,color:'var(--mu)'}}>Inactive</span><span style={{fontWeight:600,color:'var(--mu)'}}>{inactive}</span></div>
+            <div className="pbar"><div className="pfill" style={{width:`${users.length?inactive/users.length*100:0}%`,background:'var(--mu2)'}}/></div>
+          </div>
+          <hr className="sep"/>
+          <div style={{display:'flex',justifyContent:'space-between'}}>
+            <span style={{fontSize:13,color:'var(--mu)'}}>Est. monthly revenue</span>
+            <span style={{fontFamily:'Syne,sans-serif',fontWeight:700,color:'var(--amb)'}}>£{fmt2(monthly*9.99+yearly*(99.99/12))}</span>
+          </div>
+        </div>
+        <div className="card">
+          <h3 style={{fontSize:15,fontWeight:600,marginBottom:16}}>Charity contributions</h3>
+          {charityBreakdown.map((c,i)=>(
+            <div key={c.id} style={{marginBottom:12}}>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:5}}>
+                <span style={{fontSize:14}}>{c.emoji} {c.name}</span>
+                <span style={{fontWeight:600,color:'var(--grn)'}}>£{fmt2(c.total)}/mo</span>
+              </div>
+              <div className="pbar"><div className="pfill green" style={{width:`${totalCharity?c.total/totalCharity*100:0}%`,background:'var(--grn)'}}/></div>
+              <div style={{fontSize:11,color:'var(--mu)',marginTop:3}}>{c.count} supporters</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ───── ROOT APP ───── */
+function App(){
+  const [users,setUsers]=useState(()=>{
+    try{const s=localStorage.getItem('orbit_users');return s?JSON.parse(s):INITIAL_USERS;}
+    catch{return INITIAL_USERS;}
+  });
+  const [draws,setDraws]=useState(DRAWS);
+  const [page,setPage]=useState('landing');
+  const [authMode,setAuthMode]=useState(null);
+  const [user,setUser]=useState(null);
+
+  useEffect(()=>{
+    try{const s=localStorage.getItem('orbit_session');if(s){const uid=JSON.parse(s);const u=users.find(x=>x.id===uid);if(u)setUser(u);}}catch{}
+  },[]);
+
+  function handleAuth(mode){setAuthMode(mode);}
+
+  function handleAuthSuccess(newUser,newUsers){
+    if(newUsers)setUsers(newUsers);
+    setUser(newUser);
+    setAuthMode(null);
+    try{localStorage.setItem('orbit_session',JSON.stringify(newUser.id));}catch{}
+    setPage(newUser.role==='admin'?'admin':'dashboard');
+    toast(`Welcome${newUser.role==='admin'?' back, Admin':`, ${newUser.name.split(' ')[0]}`}! 🎉`,'ok');
+  }
+
+  function handleLogout(){
+    setUser(null);setPage('landing');
+    try{localStorage.removeItem('orbit_session');}catch{}
+    toast('Signed out.','info');
+  }
+
+  function updateUser(updated){
+    setUser(updated);
+    setUsers(prev=>{
+      const next=prev.map(u=>u.id===updated.id?updated:u);
+      try{localStorage.setItem('orbit_users',JSON.stringify(next));}catch{}
+      return next;
+    });
+  }
+
+  function setDrawsAndPersist(fn){
+    setDraws(typeof fn==='function'?fn:()=>fn);
+  }
+
+  return(
+    <>
+      <ToastSystem/>
+      <Navbar page={page} setPage={p=>{if(!user&&p!=='landing'){setAuthMode('login');return;}setPage(p);}} user={user} onAuth={handleAuth} onLogout={handleLogout}/>
+      {page==='landing'&&<Landing onAuth={handleAuth}/>}
+      {page==='dashboard'&&user&&<Dashboard user={user} updateUser={updateUser} draws={draws} users={users}/>}
+      {page==='charities'&&<CharitiesPage user={user} updateUser={updateUser}/>}
+      {page==='admin'&&user?.role==='admin'&&<AdminPanel users={users} setUsers={u=>{const next=typeof u==='function'?u(users):u;setUsers(next);try{localStorage.setItem('orbit_users',JSON.stringify(next));}catch{}}} draws={draws} setDraws={setDrawsAndPersist}/>}
+      {authMode&&<AuthModal mode={authMode} onClose={()=>setAuthMode(null)} onSuccess={handleAuthSuccess}/>}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
