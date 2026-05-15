@@ -9,7 +9,7 @@ A fully client-side web application that combines golf Stableford scoring, month
 ## 🚀 Live Demo
 
 Open `index.html` directly in any modern browser — no server, no dependencies to install.
-Click on link (Vercel): orbit-subscription-driven-web-appli.vercel.app
+
 ---
 
 ## 📖 What is ORBIT?
