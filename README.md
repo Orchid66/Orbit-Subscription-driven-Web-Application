@@ -5,14 +5,17 @@ A fully client-side web application that combines golf Stableford scoring, month
 > **Built with:** React 18 (UMD) · Vanilla CSS · Babel Standalone · HTML · No build step required.
 
 ---
+## Launch App 
 
-## 🚀 Live Demo
+Link : orbit-subscription-driven-web-appli.vercel.app
+
+## Live Demo
 
 Open `index.html` directly in any modern browser — no server, no dependencies to install.
 
 ---
 
-## 📖 What is ORBIT?
+## What is ORBIT?
 
 ORBIT is a concept platform for UK golfers where:
 
@@ -23,22 +26,22 @@ ORBIT is a concept platform for UK golfers where:
 
 ---
 
-## ✨ Features
+## Features
 
-### 🧑‍💼 Subscriber Dashboard
+### Subscriber Dashboard
 - Log, edit, and delete Stableford scores (max 5, most recent kept)
 - View upcoming draw entry status
 - Track past draw results and prize matches
 - Select and adjust charity contribution percentage (10–50%)
 - View full winnings history with payout status
 
-### 🏆 Draw System
+### Draw System
 - Monthly draws with 5 numbers from 1–45
 - Three prize tiers: 5-match Jackpot (40%), 4-match (35%), 3-match (25%)
 - Jackpot rolls over if unclaimed
 - Scores must be logged (1–45 range) — naturally map to draw numbers
 
-### 💚 Charity Partners
+###  Charity Partners
 | Charity | Category | Impact |
 |---|---|---|
 | Clean Water Initiative | Humanitarian | 12,400 people served |
@@ -58,7 +61,7 @@ ORBIT is a concept platform for UK golfers where:
 
 ---
 
-## 🔐 Demo Credentials
+## Demo Credentials
 
 | Role | Email | Password |
 |---|---|---|
@@ -69,10 +72,10 @@ Additional seed users: `sarah@example.com`, `tom@example.com`, `priya@example.co
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
-orbit-app.html       ← Entire application (single file)
+index.html       ← Entire application (single file)
 README.md            ← This file
 LICENSE              ← MIT License
 .gitignore           ← Standard web project ignores
@@ -80,7 +83,7 @@ LICENSE              ← MIT License
 
 ---
 
-## 🏗️ Technical Notes
+## Technical Notes
 
 | Detail | Info |
 |---|---|
@@ -106,7 +109,7 @@ Prize pool = 60% of (active subscribers × £9.99/month)
 
 ---
 
-## 💡 Subscription Plans
+## Subscription Plans
 
 | Plan | Price | Notes |
 |---|---|---|
@@ -115,7 +118,7 @@ Prize pool = 60% of (active subscribers × £9.99/month)
 
 ---
 
-## 🎨 Design System
+## Design System
 
 The UI uses a custom dark design system with CSS variables:
 
@@ -131,7 +134,7 @@ The UI uses a custom dark design system with CSS variables:
 
 ---
 
-## 📜 License
+## License
 
 MIT — see [LICENSE](LICENSE) for details.
 
