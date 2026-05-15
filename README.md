@@ -1,4 +1,4 @@
-# ORBIT — Score. Draw. Give. ⛳
+# ORBIT — Score. Draw. Give.
 
 A fully client-side web application that combines golf Stableford scoring, monthly prize draws, and charity giving into a single subscription platform.
 
