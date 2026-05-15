@@ -2,7 +2,7 @@
 
 A fully client-side web application that combines golf Stableford scoring, monthly prize draws, and charity giving into a single subscription platform.
 
-> **Built with:** React 18 (UMD) · Vanilla CSS · Babel Standalone · No build step required.
+> **Built with:** React 18 (UMD) · Vanilla CSS · Babel Standalone · HTML · No build step required.
 
 ---
 
